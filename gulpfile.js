@@ -97,6 +97,12 @@ function images() {
     }))
     .pipe(dest(paths.build.img))
     .pipe(src(paths.src.img))
+    .pipe(dest(paths.build.img))
+    .pipe(browserSync.stream())
+}
+
+function optimizeImg() {
+  return src(paths.src.img)
     .pipe(imageMin([
       imageMin.gifsicle({ interlaced: true }),
       imageMin.mozjpeg({ quality: 75, progressive: true }),
@@ -109,7 +115,6 @@ function images() {
       })
     ]))
     .pipe(dest(paths.build.img))
-    .pipe(browserSync.stream())
 }
 
 function libs() {
@@ -147,9 +152,10 @@ function watching() {
   watch([paths.watch.libs], libs);
 }
 
-const build = series(clean, parallel(js, css, html, images, fonts, libs))
+const build = series(clean, parallel(js, css, html, images, fonts, libs));
 const mainTask = parallel(build, watching, sync);
 
+exports.optimizeImg = optimizeImg;
 exports.toTtf = toTtf;
 exports.fonts = fonts;
 exports.images = images;
